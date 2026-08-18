@@ -1,7 +1,7 @@
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import JsonOutputParser
+from langchain_classic.output_parsers import StructuredOutputParser, ResponseSchema
 
 load_dotenv()
 
@@ -13,25 +13,28 @@ llm = HuggingFaceEndpoint(
 
 model = ChatHuggingFace(llm=llm)
 
-parser = JsonOutputParser()
+schema = [
+    ResponseSchema(name='fact_1', description='Fact 1 about the topic'),
+    ResponseSchema(name='fact_2', description='Fact 2 about the topic'),
+    ResponseSchema(name='fact_3', description='Fact 3 about the topic'),
+]
+
+parser = StructuredOutputParser.from_response_schemas(schema)
 
 template = PromptTemplate(
-    template="Give me the name, age, and city of a fictional person. \n {format_instruction}",
-    input_variables=[],
+    template="Give 3 facts about the {topic} \n {format_instruction}",
+    input_variables=['topic'],
     partial_variables={'format_instruction':parser.get_format_instructions()}
 )
-# can write below three lines with the help of chains
-# prompt = template.format()
+
+# prompt = template.invoke({'topic':'black hole'})
 # result = model.invoke(prompt)
 # final_result = parser.parse(result.content)
-
 # print(final_result)
-# print(type(final_result))
 
-# given as
 chain = template | model | parser
-result = chain.invoke({})
+result = chain.invoke({'topic':'black hole'})
 print(result)
 
 # disadvantage
-# jsonoutputparser does not enforce schema (means if you want a result in your own format)
+# data validation
