@@ -13,9 +13,6 @@ class NakliLLM:
 
         return random.choice(response_list)
 
-# llm = NakliLLM()
-# response = llm.predict("What is the Capital of Pakistan?")
-# print(response)
 
 
 class NakliPromptTemplate:
@@ -25,10 +22,11 @@ class NakliPromptTemplate:
 
     def format(self, input_dict):
         return self.template.format(**input_dict)
+    
 
 template = NakliPromptTemplate(
     template="Write a {length} poem about {topic}",
-    input_variables=['topic']
+    input_variables=['length','topic']
 )
 
 prompt = template.format({'length':'short', 'topic':'Pakistan'})
