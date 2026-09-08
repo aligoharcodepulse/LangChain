@@ -101,6 +101,11 @@ parallel_chain = RunnableParallel({
     "question": RunnablePassthrough()
 })
 
-chain_test = parallel_chain.invoke("What is LLM")
+parallel_chain_test = parallel_chain.invoke("What is LLM")
+
+parser = StrOutputParser()
+main_chain = parallel_chain | prompt | model | parser
+result = main_chain.invoke("Can you summarize the video?")
+print(result)
 
 
