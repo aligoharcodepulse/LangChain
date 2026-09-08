@@ -3,6 +3,8 @@ from langchain_classic.text_splitter import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings, ChatHuggingFace, HuggingFaceEndpoint
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
+from langchain_core.output_parsers import StrOutputParser
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -83,6 +85,22 @@ final_prompt = prompt.invoke({"context":context_text, "question":question})
 
 # Step - 4 (Generation)
 answer = model.invoke(final_prompt)
-print(answer)
+#print(answer)
+
+
+# Building a Chain
+def format_docs(retrieved_docs):
+    context_text = "\n\n".join(
+        doc.page_content for doc in retrieved_docs
+    )
+    return context_text
+
+
+parallel_chain = RunnableParallel({
+    "context": retriever | RunnableLambda(format_docs),
+    "question": RunnablePassthrough()
+})
+
+chain_test = parallel_chain.invoke("What is LLM")
 
 
