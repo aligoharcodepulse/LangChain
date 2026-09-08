@@ -50,7 +50,7 @@ query = retriever.invoke("What is large language model?")
 
 # Step - 3 (Augmentation)
 llm = HuggingFaceEndpoint(
-    repo_id="HuggingFaceH4/zephyr-7b-beta",
+    repo_id="meta-llama/Llama-3.1-8B-Instruct",
     task="text-generation",
     max_new_tokens=512,
     temperature=0.2
@@ -77,6 +77,12 @@ retrieved_docs = retriever.invoke(question)
 #print(retrieved_docs)
 
 context_text = "\n\n".join(doc.page_content for doc in retrieved_docs)
-print(context_text)
+#print(context_text)
 final_prompt = prompt.invoke({"context":context_text, "question":question})
+
+
+# Step - 4 (Generation)
+answer = model.invoke(final_prompt)
+print(answer)
+
 
